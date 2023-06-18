@@ -1,50 +1,38 @@
-import java.io.File;
-import java.io.RandomAccessFile;
+package new_helpers;
+
+import java.io.*;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.TreeMap;
-import java.util.Scanner;
 
-/**
- * Program reads through user provided files, uses Dynamic Programing to
- * search for longest common sub-sequence (lcs), assigns plagiarism scores to pairs of files.
- * @author Ryan Kirsch
- * @version May 2019
- */
-// All test files: 1.txt, 2.txt, 3.txt, 4.txt, 5.txt, 6.txt, 7.txt, 8.txt, 9.txt, 10.txt, 11.txt, 12.txt, 13.txt, 14.txt, 15.txt, 16.txt, 17.txt, 18.txt, 19.txt, 20.txt, 21.txt, 22.txt, 23.txt, 24.txt, 25.txt, 26.txt, 27.txt, 28.txt, 29.txt
-public class PlagiarismChecker {
+public class HelperFunctions {
 
-    /**
-     * Main - gets user input, calls plagiarismChecker, loops until terminated by user
-     */
-    public static void main(String[] args) {
-        Scanner keyboard = new Scanner(System.in);
-        // get initial files to compare
-        System.out.println("Enter all files to check, on one line, separated by commas: ");
-        String line = keyboard.nextLine();
+    public static String readFile(String fileName) {
+        // TODO Auto-generated method stub
+        FileInputStream filestream;
 
-        // loop main
-        while (!line.equals("x")) {
-            // replace all whitespace in line
-            line = line.replaceAll("\\s+", "");
-            // split on commas into arr
-            String[] fileArr = line.split(",");
+        String result = "";
 
-            // Wait until file input has been provided (line contains something)
-            if (!line.equals("")) {
-                // get threshold
-                System.out.println("Set a plagiarism threshold [Enter 0 for no threshold]: ");
-                double thresh = keyboard.nextDouble();
+        try {
+            filestream = new FileInputStream(fileName);
+            BufferedReader br = new BufferedReader(new InputStreamReader(filestream));
+            String str = br.readLine();
 
-                // call plagiarismChecker on files with threshold
-                plagiarismChecker(fileArr, thresh);    // takes ~80 seconds for all files (1-29)
-
-                System.out.println();
-                // prompt user for more text or to exit
-                System.out.println("Enter another set of files to check, on one line, separated by commas: (\"x\" to exit) ");
+            while (str != null) {
+                result = result + str;
+                str = br.readLine();
             }
-            // get next line (will either be more files or "x" to exit)
-            line = keyboard.nextLine();
+
+            br.close();
+
+        } catch (FileNotFoundException e) {
+             // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
+        return result;
     }
 
     /**
@@ -66,7 +54,7 @@ public class PlagiarismChecker {
         for (int i = 1; i <= charArr1.length; i++) {
             for (int j = 1; j <= charArr2.length; j++) {
                 // if two chars are the same:
-                if (charArr1[i - 1 ] == charArr2[j - 1]) {
+                if (charArr1[i - 1] == charArr2[j - 1]) {
                     if (i % 2 == 0) // row is even (row 1 is previous row)
                         lcsArr[0][j] = lcsArr[1][j - 1] + 1;
                     else  // row is odd (row 0 is previous row)
@@ -105,7 +93,7 @@ public class PlagiarismChecker {
      * @param filenames array of files to search through
      * @param threshold value at which to report plagiarism
      */
-    private static void plagiarismChecker(String[] filenames, double threshold) {
+    public static void plagiarismChecker(String[] filenames, double threshold) {
         // Scores and corresponding files are stored in reverse order TreeMap (reverse so largest score is first)
         TreeMap<Double, String[]> map = new TreeMap<>(Collections.reverseOrder());
 
@@ -142,24 +130,5 @@ public class PlagiarismChecker {
         }
     }
 
-    /**
-     * [Hansen's code for continuity] Read in a file building it into one long string
-     * @param fileName the name of the file
-     * @return the contents of a file as a string
-     */
-    private static String readFile(String fileName) {
-        String contents = "";
-        try {
-            RandomAccessFile fin = new RandomAccessFile(new File(fileName), "r");
-            int b = fin.read();
-            while (b != -1) {
-                contents += (char)b;
-                b = fin.read();
-            }
-        }
-        catch (Exception e) {
-            System.err.println("Trouble reading from: " + fileName);
-        }
-        return contents;
-    }
+
 }
